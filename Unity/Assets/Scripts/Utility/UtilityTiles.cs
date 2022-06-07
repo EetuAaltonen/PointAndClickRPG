@@ -25,4 +25,12 @@ public static class UtilityTiles
 
         return tile;
     }
+
+    public static TileIndex LocationToTileIndex(Vector3 location)
+    {
+        float tileX = RoundToTile(location.x) + 0.5f;
+        float tileZ = RoundToTile(location.z) + 0.5f;
+
+        return new TileIndex(Mathf.RoundToInt(tileX / 1), Mathf.RoundToInt(tileZ / 1));
+    }
 }
