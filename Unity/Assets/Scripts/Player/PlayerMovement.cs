@@ -13,6 +13,9 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField]
     private GameObject m_TargetDestination;
 
+    [SerializeField]
+    private GlobalTileController m_GlobalTileController;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -32,7 +35,11 @@ public class PlayerMovement : MonoBehaviour
 
             if (Input.GetMouseButtonDown(0))
             {
-                m_NavMeshAgent.SetDestination(tileLocation);
+                if (m_GlobalTileController.RequestTileIndex(UtilityTiles.LocationToTileIndex(m_TargetDestination.transform.position), gameObject.GetInstanceID()))
+                {
+                    Debug.Log($"{UtilityTiles.LocationToTileIndex(hitPoint.point)} clicked");
+                    m_NavMeshAgent.SetDestination(tileLocation);
+                }
             }
 
             m_TargetDestination.transform.position = tileLocation;
