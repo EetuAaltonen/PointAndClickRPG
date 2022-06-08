@@ -92,9 +92,7 @@ public class Outline : MonoBehaviour
 
     void Awake()
     {
-        Debug.Log($"InitOutline start");
         InitOutline();
-        Debug.Log($"InitOutline end");
     }
 
     void OnEnable()
@@ -124,7 +122,6 @@ public class Outline : MonoBehaviour
 
     void Update()
     {
-        Debug.Log($"needsUpdate {needsUpdate}");
         if (needsUpdate)
         {
             needsUpdate = false;
