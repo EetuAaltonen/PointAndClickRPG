@@ -54,7 +54,6 @@ public class PlayerMovement : MonoBehaviour
             {
                 if (m_GlobalTileController.RequestTileIndex(tileIndex, gameObject))
                 {
-                    //Debug.Log($"{UtilityTiles.LocationToTileIndex(hitPoint.point)} clicked");
                     m_NavMeshAgent.SetDestination(tileLocation);
                 }
             }
