@@ -5,25 +5,25 @@ using UnityEngine;
 public class GlobalTileController : MonoBehaviour
 {
     [SerializeField]
+    private List<GameObject> m_GlobalParents = new List<GameObject>();
+
     private List<TileData> m_TileData = new List<TileData>();
 
     // Start is called before the first frame update
     void Start()
     {
-        GameObject[] gameObjects = GameObject.FindGameObjectsWithTag("Character");
-        foreach(GameObject character in gameObjects)
+        foreach (GameObject globalParent in m_GlobalParents)
         {
-            TileIndex tileIndex = UtilityTiles.LocationToTileIndex(character.transform.position);
-            Debug.Log($"{character.name} at {character.transform.position} with {character.GetInstanceID()} | {character.tag}");
-            m_TileData.Add(new TileData(tileIndex, character.GetInstanceID(), character.tag));
-        }
-
-        gameObjects = GameObject.FindGameObjectsWithTag("Structure");
-        foreach(GameObject structure in gameObjects)
-        {
-            Debug.Log($"{structure.name} at {structure.transform.position} with {structure.GetInstanceID()} | {structure.tag}");
-            TileIndex tileIndex = UtilityTiles.LocationToTileIndex(structure.transform.position);
-            m_TileData.Add(new TileData(tileIndex, structure.GetInstanceID(), structure.tag));
+            Transform[] childTransforms = globalParent.GetComponentsInChildren<Transform>();
+            foreach (Transform child in childTransforms)
+            {
+                if (child.gameObject.GetInstanceID() != globalParent.GetInstanceID())
+                {
+                    TileIndex tileIndex = UtilityTiles.LocationToTileIndex(child.position);
+                    Debug.Log($"{child.gameObject.name} at {child.position} as {child.gameObject.GetInstanceID()} | Layer: {child.gameObject.layer}");
+                    AddTileData(tileIndex, child.gameObject);
+                }
+            }
         }
     }
 
@@ -33,13 +33,18 @@ public class GlobalTileController : MonoBehaviour
         
     }
 
-    public bool RequestTileIndex(TileIndex checkTileIndex, int instanceId)
+    public void AddTileData(TileIndex tileIndex, GameObject gameObject)
+    {
+        m_TileData.Add(new TileData(tileIndex, gameObject));
+    }
+
+    public bool RequestTileIndex(TileIndex checkTileIndex, GameObject gameObject)
     {
         TileData CallerTileData = null;
         bool isTileEmpty = true;
         foreach(TileData tileData in m_TileData)
         {
-            if (tileData.m_InstanceId == instanceId)
+            if (tileData.m_GameObject.GetInstanceID() == gameObject.GetInstanceID())
             {
                 CallerTileData = tileData;
             }
@@ -47,6 +52,11 @@ public class GlobalTileController : MonoBehaviour
                 tileData.m_TileIndex.Z == checkTileIndex.Z)
             {
                 isTileEmpty = false;
+                var outline = tileData.m_GameObject.GetComponent<Outline>();
+                if (outline != null)
+                {
+                    outline.OutlineWidth = 5;
+                }
                 break;
             }
         }
@@ -69,16 +79,14 @@ public class GlobalTileController : MonoBehaviour
 
 public class TileData
 {
-    public TileData(TileIndex tileIndex, int instanceId, string tag)
+    public TileData(TileIndex tileIndex, GameObject gameObject)
     {
         m_TileIndex = tileIndex;
-        m_InstanceId = instanceId;
-        m_Tag = tag;
+        m_GameObject = gameObject;
     }
 
-    public TileIndex m_TileIndex  { get; set; }
-    public int m_InstanceId  { get; }
-    public string m_Tag  { get; }
+    public TileIndex m_TileIndex { get; set; }
+    public GameObject m_GameObject { get; }
 }
 
 public struct TileIndex
