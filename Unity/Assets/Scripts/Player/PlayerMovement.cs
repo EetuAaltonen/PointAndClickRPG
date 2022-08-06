@@ -1,33 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using TMPro;
 
 public class PlayerMovement : MonoBehaviour
 {
     private CharacterController m_CharacterController;
     private UnityEngine.AI.NavMeshAgent m_NavMeshAgent;
-    
-    [SerializeField]
-    private Camera m_Camera;
-    
-    [SerializeField]
-    private GameObject m_TargetDestination;
-
-    [SerializeField]
-    private GlobalTileController m_GlobalTileController;
-
-    [SerializeField]
-    private Canvas m_Canvas;
-
-    [SerializeField]
-    private TextMeshProUGUI m_TextMousePosition;
-    [SerializeField]
-    private TextMeshProUGUI m_TextCursorLocation;
-    [SerializeField]
-    private TextMeshProUGUI m_TextTileLocation;
-    [SerializeField]
-    private TextMeshProUGUI m_TextTileIndex;
 
     // Start is called before the first frame update
     void Start()
@@ -39,29 +17,60 @@ public class PlayerMovement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Ray ray = m_Camera.ScreenPointToRay(Input.mousePosition);
-        RaycastHit hitPoint;
 
-        if (Physics.Raycast(ray, out hitPoint))
+        /*if (Input.GetMouseButtonDown(0))
         {
-            Vector3 tileLocation = UtilityTiles.LocationToTile(hitPoint.point);
-            m_TextMousePosition.text = $"Mouse: {hitPoint.point}";
-            m_TextTileLocation.text = $"Tile: {tileLocation}";
-            TileIndex tileIndex = UtilityTiles.LocationToTileIndex(m_TargetDestination.transform.position);
-            m_TextTileIndex.text = $"Index: X {tileIndex.X} Z {tileIndex.Z}";
+            // Close interaction menu while moving
+            m_InteractionMenu.SetActive(false);
 
-            if (Input.GetMouseButtonDown(0))
+            if (m_GlobalTileDataController.RequestTileIndexChange(tileIndex, gameObject))
             {
-                if (m_GlobalTileController.RequestTileIndex(tileIndex, gameObject))
-                {
-                    m_NavMeshAgent.SetDestination(tileLocation);
-                }
+                m_NavMeshAgent.SetDestination(tileLocation);
             }
-
-            m_TargetDestination.transform.position = tileLocation;
-            m_TextCursorLocation.text = $"Cursor: {m_TargetDestination.transform.position}";
         }
 
-        
+        if (Input.GetMouseButtonDown(1))
+        {
+            string[] interactions = m_GlobalTileDataController.RequestTileInteractions(tileIndex);
+
+            if (m_InteractionMenu != null)
+            {
+                // Clear old menu items
+                Transform interactionContent = m_InteractionMenu.transform.GetChild(0);
+                if (interactionContent != null)
+                {
+                    UtilityGameObjects.DeleteAllChild(interactionContent);
+                }
+
+                if (interactions.Length > 0)
+                {
+                    m_InteractionMenu.SetActive(true);
+                    RectTransform rectTransform = m_InteractionMenu.GetComponent<RectTransform>();
+                    RectTransform canvasRectTransform = m_Canvas.GetComponent<RectTransform>();
+
+                    Vector3 mousePos = Input.mousePosition;
+                    Vector2 newMenuPosition = new Vector2(mousePos.x, -canvasRectTransform.rect.height + mousePos.y);
+                    rectTransform.anchoredPosition = newMenuPosition;
+
+                    // Create menu items
+                    float yPos = 0;
+                    float menuItemHeight = 18;
+                    foreach(string interaction in interactions)
+                    {
+                        GameObject tempTextBox = Instantiate(m_InteractionMenuItem_Prefab, new Vector2(0, yPos), Quaternion.identity) as GameObject;
+                        tempTextBox.transform.SetParent(interactionContent, false);
+
+                        TextMeshProUGUI textElement = tempTextBox.transform.GetChild(0).GetComponent<TextMeshProUGUI>();
+                        textElement.text = interaction;
+
+                        yPos -= menuItemHeight;
+                    }
+                }
+                else
+                {
+                    m_InteractionMenu.SetActive(false);
+                }
+            }
+        }*/
     }
 }
